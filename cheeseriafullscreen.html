@@ -3,34 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fullscreen Cheeseria Game</title>
+    <title>Ruffle Game with Fullscreen</title>
     <style>
-        /* Ensures the game fills the screen */
-        body, html {
-            height: 100%;
-            margin: 0;
+        /* Game container styling */
+        #flash-game {
+            width: 800px;
+            height: 600px;
+            margin: 20px auto;
+            background: black;
             display: flex;
-            justify-content: center;
             align-items: center;
-            background-color: black;
+            justify-content: center;
         }
 
-        #flash-game {
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
+        /* Fullscreen button styling */
+        #fullscreen-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        #fullscreen-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
+    <!-- Game container -->
     <div id="flash-game"></div>
 
+    <!-- Fullscreen button -->
+    <button id="fullscreen-btn">Fullscreen</button>
+
+    <!-- Load Ruffle -->
     <script src="https://cdn.jsdelivr.net/gh/trugiehub/fultongames/uploads/ruffle.js"></script>
+
     <script>
-        var ruffle = window.RufflePlayer.newest();
-        var player = ruffle.createPlayer();
-        document.getElementById("flash-game").appendChild(player);
-        player.load("https://cdn.jsdelivr.net/gh/trugiehub/fultongames/uploads/papascheeseria_102.swf");  // SWF file link
+        // Debugging function to log errors and progress
+        function log(message) {
+            console.log(`[DEBUG]: ${message}`);
+        }
+
+        // Fullscreen setup function
+        function setupFullscreenButton() {
+            const flashGame = document.getElementById("flash-game");
+            const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+            fullscreenBtn.addEventListener("click", function () {
+                log("Fullscreen button clicked");
+
+                // Attempt to find the Ruffle canvas dynamically
+                const ruffleCanvas = flashGame.querySelector("canvas");
+                if (ruffleCanvas) {
+                    log("Ruffle canvas found");
+
+                    // Try to request fullscreen on the canvas
+                    if (ruffleCanvas.requestFullscreen) {
+                        ruffleCanvas.requestFullscreen()
+                            .then(() => log("Fullscreen request successful"))
+                            .catch((err) => console.error("Fullscreen request failed:", err));
+                    } else {
+                        log("Fullscreen API not supported by this browser.");
+                        alert("Fullscreen is not supported in your browser.");
+                    }
+                } else {
+                    log("Ruffle canvas not found. Cannot enter fullscreen.");
+                    alert("Canvas not ready yet.");
+                }
+            });
+        }
+
+        // Initialize Ruffle
+        log("Initializing Ruffle...");
+        const ruffle = window.RufflePlayer.newest();
+        ruffle.config = { logLevel: "debug" }; // Enable Ruffle debugging
+        const player = ruffle.createPlayer();
+        const flashGame = document.getElementById("flash-game");
+
+        flashGame.appendChild(player);
+        player.load("https://cdn.jsdelivr.net/gh/trugiehub/fultongames/uploads/papascheeseria_102.swf");
+
+        // Delay fullscreen button setup to ensure Ruffle has initialized
+        setTimeout(() => {
+            log("Setting up fullscreen button...");
+            setupFullscreenButton();
+        }, 1000);
     </script>
 </body>
 </html>
